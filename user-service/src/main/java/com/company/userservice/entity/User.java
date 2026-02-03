@@ -1,5 +1,6 @@
 package com.company.userservice.entity;
 
+import com.company.userservice.enums.Membership;
 import com.company.userservice.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -24,4 +25,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Membership membershipLevel;
 }
