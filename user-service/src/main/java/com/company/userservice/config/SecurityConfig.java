@@ -15,8 +15,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/users/**").permitAll() // 允许登录和注册(POST /users)
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .build();
     }
