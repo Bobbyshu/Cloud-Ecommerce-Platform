@@ -9,6 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <packaging>pom</packaging>
+    <modules>
+        <module>eureka-server</module>
+    </modules>
     <groupId>com.company</groupId>
     <artifactId>cloud-ecommerce-platform</artifactId>
     <version>0.0.1-SNAPSHOT</version>
