@@ -31,8 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### Ignore Spring Boot Local Configs ###
-application.yml
-application.yaml
-application.properties
