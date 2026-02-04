@@ -27,7 +27,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             ServerHttpRequest request = exchange.getRequest();
             String path = request.getURI().getPath();
 
-            // 1. white list
+            // 1. whitelist
             if (path.contains("/auth") || (path.contains("/users") && request.getMethod().name().equals("POST"))) {
                 return chain.filter(exchange);
             }
@@ -46,6 +46,18 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             try {
                 String token = authHeader.substring(7);
                 jwtUtil.validateToken(token);
+
+                // RBAC
+                // extract role
+                String userRole = jwtUtil.extractRole(token);
+                String method = request.getMethod().name();
+
+                // only ADMIN can DELETE
+                if (method.equals("DELETE")) {
+                    if (!"ADMIN".equals(userRole)) {
+                        return onError(exchange, HttpStatus.FORBIDDEN);
+                    }
+                }
             } catch (Exception e) {
                 return onError(exchange, HttpStatus.FORBIDDEN);
             }
