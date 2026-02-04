@@ -1,6 +1,8 @@
 package com.company.apigateway.filter;
 
 import com.company.apigateway.util.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -14,6 +16,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -26,6 +29,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             String path = request.getURI().getPath();
+
+            logger.info("Gateway received request: path={}", path);
 
             // 1. whitelist
             if (path.contains("/auth") || (path.contains("/users") && request.getMethod().name().equals("POST"))) {
@@ -59,6 +64,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     }
                 }
             } catch (Exception e) {
+                logger.error("Token validation failed: {}", e.getMessage());
                 return onError(exchange, HttpStatus.FORBIDDEN);
             }
 
