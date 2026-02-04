@@ -3,6 +3,8 @@ package com.company.userservice.service.impl;
 import com.company.userservice.dao.UserRepository;
 import com.company.userservice.entity.User;
 import com.company.userservice.enums.Membership;
+import com.company.userservice.exception.UserEmailAlreadyExistsException;
+import com.company.userservice.exception.UsernameAlreadyExistsException;
 import com.company.userservice.exception.UserNotExistException;
 import com.company.userservice.service.UserService;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new UsernameAlreadyExistsException(user.getUsername());
+        }
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserEmailAlreadyExistsException(user.getEmail());
+        }
+
         if (user.getMembershipLevel() == null) {
             user.setMembershipLevel(Membership.SILVER);
         }
