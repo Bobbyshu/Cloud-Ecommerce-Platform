@@ -7,6 +7,7 @@ import com.company.productservice.exception.ProductNotFoundException;
 import com.company.productservice.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -33,8 +34,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void reduceStock(Long id, Integer quantity) {
-        Product product = productRepo.findById(id)
+        Product product = productRepo.findByIdWithLock(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
 
         if (product.getStock() < quantity) {
