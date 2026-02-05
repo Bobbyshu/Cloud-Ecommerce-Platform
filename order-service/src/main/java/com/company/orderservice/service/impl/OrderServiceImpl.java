@@ -44,6 +44,10 @@ public class OrderServiceImpl implements OrderService {
             throw new ProductNotFoundException(order.getProductId());
         }
 
+        if (product == null) {
+            throw new ProductNotFoundException(order.getProductId());
+        }
+
         // 3. check stock
         if (product.getStock() < order.getQuantity()) {
             throw new InsufficientStockException("Out of stock for product ID: " + order.getProductId() +
