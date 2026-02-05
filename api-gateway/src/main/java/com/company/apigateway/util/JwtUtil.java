@@ -39,6 +39,10 @@ public class JwtUtil {
         return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
+    public String extractUserId(String token) {
+        return extractClaim(token, claims -> String.valueOf(claims.get("userId")));
+    }
+
     private Key getSignKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }

@@ -52,6 +52,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 String token = authHeader.substring(7);
                 jwtUtil.validateToken(token);
 
+                String userId = jwtUtil.extractUserId(token);
+                ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                        .header("loggedInUserId", userId)
+                        .build();
+
                 // RBAC
                 // extract role
                 String userRole = jwtUtil.extractRole(token);
@@ -75,12 +80,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         }
                     }
                 }
+                return chain.filter(exchange.mutate().request(mutatedRequest).build());
             } catch (Exception e) {
                 logger.error("Token validation failed: {}", e.getMessage());
                 return onError(exchange, HttpStatus.FORBIDDEN);
             }
-
-            return chain.filter(exchange);
         };
     }
 

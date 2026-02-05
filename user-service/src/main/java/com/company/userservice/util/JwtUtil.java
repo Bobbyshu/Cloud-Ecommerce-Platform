@@ -18,10 +18,11 @@ public class JwtUtil {
     }
 
     // generate Token
-    public String generateToken(String username, String role, String membershipLevel) {
+    public String generateToken(String username, String role, String membershipLevel, Long userId) {
         Map<String, Object> claims = Map.of(
                 "role", role,
-                "membership_level", membershipLevel
+                "membership_level", membershipLevel,
+                "userId", userId
         );
         return createToken(claims, username);
     }

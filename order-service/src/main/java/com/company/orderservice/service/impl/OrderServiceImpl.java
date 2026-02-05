@@ -8,6 +8,7 @@ import com.company.orderservice.entity.Order;
 import com.company.orderservice.enums.OrderStatus;
 import com.company.orderservice.exception.InsufficientStockException;
 import com.company.orderservice.exception.ProductNotFoundException;
+import com.company.orderservice.exception.UserIdInvalidException;
 import com.company.orderservice.exception.UserNotFoundException;
 import com.company.orderservice.service.OrderService;
 import feign.FeignException;
@@ -28,7 +29,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order createOrder(Order order) {
+    public Order createOrder(Order order, String loggedInUserId) {
+        if (!loggedInUserId.equals(order.getUserId().toString())) {
+            throw new UserIdInvalidException("Access Denied: You cannot create orders for others!");
+        }
         // 1. check user exist
         try {
             userClient.getUserById(order.getUserId());

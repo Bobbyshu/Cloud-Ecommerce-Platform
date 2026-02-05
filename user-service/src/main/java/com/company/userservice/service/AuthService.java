@@ -14,6 +14,11 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    public String saveUser(User user) {
+        userRepository.save(user);
+        return jwtUtil.generateToken(user.getUsername(), user.getRole().name(), user.getMembershipLevel().name(), user.getId());
+    }
+
     public String generateToken(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -24,6 +29,6 @@ public class AuthService {
         }
         // send Token
         String level = user.getMembershipLevel() != null ? user.getMembershipLevel().name() : "SILVER";
-        return jwtUtil.generateToken(user.getUsername(), user.getRole().name(), level);
+        return jwtUtil.generateToken(user.getUsername(), user.getRole().name(), level, user.getId());
     }
 }
