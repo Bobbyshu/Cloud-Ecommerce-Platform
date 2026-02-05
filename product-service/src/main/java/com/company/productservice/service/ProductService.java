@@ -7,4 +7,5 @@ public interface ProductService {
     Product getProductById(Long id);
     Product updateProduct(Product product);
     void deleteProduct(Long id);
+    void reduceStock(Long id, Integer quantity);
 }

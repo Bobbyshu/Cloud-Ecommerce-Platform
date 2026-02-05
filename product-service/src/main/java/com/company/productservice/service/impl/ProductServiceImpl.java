@@ -2,6 +2,8 @@ package com.company.productservice.service.impl;
 
 import com.company.productservice.dao.ProductRepository;
 import com.company.productservice.entity.Product;
+import com.company.productservice.exception.InsufficientStockException;
+import com.company.productservice.exception.ProductNotFoundException;
 import com.company.productservice.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,5 +30,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long id) {
         productRepo.deleteById(id);
+    }
+
+    @Override
+    public void reduceStock(Long id, Integer quantity) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+
+        if (product.getStock() < quantity) {
+            throw new InsufficientStockException("Insufficient stock for product id: " + id);
+        }
+
+        product.setStock(product.getStock() - quantity);
+        productRepo.save(product);
     }
 }
