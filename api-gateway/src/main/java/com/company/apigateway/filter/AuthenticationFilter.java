@@ -57,10 +57,21 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 String userRole = jwtUtil.extractRole(token);
                 String method = request.getMethod().name();
 
-                // only ADMIN can DELETE
+                // rule1: only ADMIN can DELETE
                 if (method.equals("DELETE")) {
                     if (!"ADMIN".equals(userRole)) {
                         return onError(exchange, HttpStatus.FORBIDDEN);
+                    }
+                }
+
+                // rule 2: Only admin can do all product service
+                if (path.contains("/products")) {
+                    // for post/put/delete
+                    if (method.equals("POST") || method.equals("PUT") || method.equals("DELETE")) {
+                        // only admin available
+                        if (!"ADMIN".equals(userRole)) {
+                            return onError(exchange, HttpStatus.FORBIDDEN);
+                        }
                     }
                 }
             } catch (Exception e) {
