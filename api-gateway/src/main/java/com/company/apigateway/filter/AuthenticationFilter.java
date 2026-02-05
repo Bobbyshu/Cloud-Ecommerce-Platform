@@ -64,6 +64,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     }
                 }
 
+                logger.info("Path: {}, Method: {}, UserRole: {}", path, method, userRole);
                 // rule 2: Only admin can do all product service
                 if (path.contains("/products")) {
                     // for post/put/delete
