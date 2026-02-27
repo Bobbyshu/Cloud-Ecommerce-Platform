@@ -1,6 +1,8 @@
 package com.company.userservice.service.impl;
 
+import com.company.userservice.client.NotificationClient;
 import com.company.userservice.dao.UserRepository;
+import com.company.userservice.dto.EmailNotificationRequest;
 import com.company.userservice.entity.User;
 import com.company.userservice.enums.Membership;
 import com.company.userservice.exception.UserEmailAlreadyExistsException;
@@ -8,14 +10,17 @@ import com.company.userservice.exception.UsernameAlreadyExistsException;
 import com.company.userservice.exception.UserNotExistException;
 import com.company.userservice.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationClient notificationClient;
 
     @Override
     public User createUser(User user) {
@@ -31,7 +36,9 @@ public class UserServiceImpl implements UserService {
             user.setMembershipLevel(Membership.SILVER);
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        sendWelcomeNotification(savedUser);
+        return savedUser;
     }
 
     @Override
@@ -58,5 +65,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    private void sendWelcomeNotification(User user) {
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            return;
+        }
+
+        String subject = "Welcome to Cloud E-commerce Platform";
+        String body = "Hi " + user.getUsername() + ", your account has been created successfully.";
+
+        try {
+            notificationClient.sendEmail(new EmailNotificationRequest(user.getEmail(), subject, body));
+        } catch (Exception exception) {
+            log.warn("User {} created, but welcome email failed: {}", user.getId(), exception.getMessage());
+        }
     }
 }
